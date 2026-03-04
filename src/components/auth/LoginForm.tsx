@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,22 +17,22 @@ import { useAuthUIStore } from "@/store/use-auth-ui-store";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, setLoading } = useAuthUIStore();
+  const isLoading = useAuthUIStore((state) => state.isLoading);
+  const setLoading = useAuthUIStore((state) => state.setLoading);
 
-  useEffect(() => {
-    setLoading(false);
-  }, [setLoading]);
+  const handleSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+      if (isLoading) {
+        return;
+      }
 
-    if (isLoading) {
-      return;
-    }
-
-    setLoading(true);
-    window.setTimeout(() => setLoading(false), 900);
-  };
+      setLoading(true);
+      window.setTimeout(() => setLoading(false), 900);
+    },
+    [isLoading, setLoading],
+  );
 
   return (
     <motion.div
@@ -40,19 +40,19 @@ export default function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.32, ease: "easeOut" }}
     >
-      <Card className="w-full rounded-xl shadow-sm">
-        <CardHeader className="space-y-2 px-5 pt-5 sm:px-6 sm:pt-6">
-          <CardTitle className="text-2xl font-bold text-slate-900">
+      <Card className="w-full rounded-xl border-slate-200/80 bg-white/95 shadow-sm">
+        <CardHeader className="space-y-2.5 px-5 pt-6 sm:px-6 sm:pt-7">
+          <CardTitle className="text-3xl font-semibold tracking-tight text-slate-900">
             Welcome Back
           </CardTitle>
-          <CardDescription className="text-sm text-slate-700">
+          <CardDescription className="text-sm leading-6 text-slate-700">
             Login to manage your queues
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
+        <CardContent className="px-5 pb-6 sm:px-6 sm:pb-7">
           <form
-            className="space-y-4"
+            className="space-y-5"
             aria-label="Login form"
             onSubmit={handleSubmit}
           >
@@ -68,7 +68,7 @@ export default function LoginForm() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
+                className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
                 placeholder="you@example.com"
               />
             </div>
@@ -86,7 +86,7 @@ export default function LoginForm() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
+                  className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
                   placeholder="Enter your password"
                 />
                 <button
@@ -129,7 +129,7 @@ export default function LoginForm() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-accent/60 disabled:text-accent-foreground/80"
+              className="w-full bg-accent text-accent-foreground transition-all hover:bg-accent/90 hover:shadow-md disabled:cursor-not-allowed disabled:bg-accent/60 disabled:text-accent-foreground/80"
               aria-label="Login to QueueSetu"
             >
               {isLoading ? (
@@ -149,7 +149,7 @@ export default function LoginForm() {
           <p className="mt-4 text-center text-sm text-slate-600">
             Don&apos;t have an account?{" "}
             <Link
-              href="#"
+              href="/register"
               className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
             >
               Register
