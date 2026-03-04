@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
 type UIState = {
-  isSidebarOpen: boolean;
-  setSidebarOpen: (isOpen: boolean) => void;
-  toggleSidebar: () => void;
+  isMobileMenuOpen: boolean;
+  toggleMenu: () => void;
+  closeMenu: () => void;
 };
 
 export const useUIStore = create<UIState>((set) => ({
-  isSidebarOpen: false,
-  setSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
-  toggleSidebar: () =>
-    set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  isMobileMenuOpen: false,
+  toggleMenu: () =>
+    set((state) => ({ isMobileMenuOpen: !state.isMobileMenuOpen })),
+  closeMenu: () => set({ isMobileMenuOpen: false }),
 }));
