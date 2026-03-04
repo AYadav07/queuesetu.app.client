@@ -20,21 +20,21 @@ export default function RegisterForm() {
       transition={{ duration: 0.32, ease: "easeOut" }}
     >
       <Card className="w-full rounded-xl shadow-sm">
-        <CardHeader className="space-y-2">
+        <CardHeader className="space-y-2 px-5 pt-5 sm:px-6 sm:pt-6">
           <CardTitle className="text-2xl font-bold text-slate-900">
             Create Account
           </CardTitle>
-          <CardDescription className="text-sm text-slate-600">
+          <CardDescription className="text-sm text-slate-700">
             Start managing queues smarter
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
           <form className="space-y-4" aria-label="Register form">
             <div className="space-y-2">
               <label
                 htmlFor="fullName"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-800"
               >
                 Full Name
               </label>
@@ -43,7 +43,7 @@ export default function RegisterForm() {
                 name="fullName"
                 type="text"
                 autoComplete="name"
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
                 placeholder="Enter your full name"
               />
             </div>
@@ -51,7 +51,7 @@ export default function RegisterForm() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-800"
               >
                 Email
               </label>
@@ -60,7 +60,7 @@ export default function RegisterForm() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
                 placeholder="you@example.com"
               />
             </div>
@@ -68,7 +68,7 @@ export default function RegisterForm() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-800"
               >
                 Password
               </label>
@@ -77,7 +77,7 @@ export default function RegisterForm() {
                 name="password"
                 type="password"
                 autoComplete="new-password"
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
                 placeholder="Create a password"
               />
             </div>
@@ -85,7 +85,7 @@ export default function RegisterForm() {
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="text-sm font-medium text-slate-700"
+                className="text-sm font-medium text-slate-800"
               >
                 Confirm Password
               </label>
@@ -94,26 +94,26 @@ export default function RegisterForm() {
                 name="confirmPassword"
                 type="password"
                 autoComplete="new-password"
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30"
                 placeholder="Confirm your password"
               />
             </div>
 
             <label
               htmlFor="terms"
-              className="inline-flex items-start gap-2 text-sm text-slate-600"
+              className="inline-flex items-start gap-2 text-sm text-slate-700"
             >
               <input
                 id="terms"
                 name="terms"
                 type="checkbox"
-                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-accent focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-accent focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               />
               <span>
                 I agree to the{" "}
                 <Link
                   href="#"
-                  className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
                 >
                   terms &amp; conditions
                 </Link>
@@ -122,7 +122,7 @@ export default function RegisterForm() {
 
             <Button
               type="submit"
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-accent/60 disabled:text-accent-foreground/80"
               aria-label="Create QueueSetu account"
             >
               Create Account
@@ -133,7 +133,7 @@ export default function RegisterForm() {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
             >
               Login
             </Link>
