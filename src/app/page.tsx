@@ -1,5 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import HeroSection from "@/components/home/HeroSection";
+import TrustSection from "@/components/home/TrustSection";
 
 export default function Home() {
   return (
@@ -7,26 +8,7 @@ export default function Home() {
       <Navbar />
       <main className="py-12 sm:py-16 lg:py-20">
         <HeroSection />
-
-        <section className="mt-8 rounded-xl bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
-            Trusted by modern service teams
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-slate-600 sm:grid-cols-4">
-            <div className="rounded-xl border border-slate-100 px-4 py-3">
-              CarePlus
-            </div>
-            <div className="rounded-xl border border-slate-100 px-4 py-3">
-              UrbanMed
-            </div>
-            <div className="rounded-xl border border-slate-100 px-4 py-3">
-              CityServe
-            </div>
-            <div className="rounded-xl border border-slate-100 px-4 py-3">
-              QueueWorks
-            </div>
-          </div>
-        </section>
+        <TrustSection />
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <article className="rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md">
