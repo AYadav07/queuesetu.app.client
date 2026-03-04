@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="py-12 sm:py-16 lg:py-20">
+      <main className="py-10 sm:py-16 lg:py-20">
         <Container>
           <HeroSection />
           <TrustSection />

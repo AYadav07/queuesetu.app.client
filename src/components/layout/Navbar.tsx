@@ -31,11 +31,16 @@ export default function Navbar() {
             </Button>
 
             <div className="hidden items-center gap-2 md:flex">
-              <Button type="button" variant="outline">
+              <Button
+                type="button"
+                variant="outline"
+                aria-label="Login to QueueSetu"
+              >
                 Login
               </Button>
               <Button
                 type="button"
+                aria-label="Get started with QueueSetu"
                 className="bg-accent text-accent-foreground hover:bg-accent/90"
               >
                 Get Started

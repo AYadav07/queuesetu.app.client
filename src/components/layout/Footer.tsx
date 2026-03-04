@@ -32,7 +32,7 @@ export default function Footer() {
                     <li key={link}>
                       <Link
                         href="#"
-                        className="text-sm text-slate-500 hover:text-slate-700"
+                        className="text-sm text-slate-500 transition-colors hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
                       >
                         {link}
                       </Link>

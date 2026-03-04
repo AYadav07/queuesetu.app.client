@@ -12,6 +12,7 @@ export default function CTASection() {
       <div className="mt-6 flex justify-center">
         <Button
           type="button"
+          aria-label="Start free trial today"
           className="bg-accent text-accent-foreground shadow-sm transition-transform hover:scale-[1.02] hover:bg-accent/90 focus-visible:ring-white/60"
         >
           Start Free Today
