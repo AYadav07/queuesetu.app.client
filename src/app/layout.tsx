@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Container } from "@/components/layout/container";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,7 +22,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} min-h-screen bg-background text-slate-800 antialiased`}
       >
-        <Container>{children}</Container>
+        {children}
       </body>
     </html>
   );
