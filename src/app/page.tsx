@@ -1,30 +1,12 @@
 import Navbar from "@/components/layout/Navbar";
+import HeroSection from "@/components/home/HeroSection";
 
 export default function Home() {
   return (
     <>
       <Navbar />
       <main className="py-12 sm:py-16 lg:py-20">
-        <section className="rounded-xl bg-white p-6 shadow-sm sm:p-8 lg:p-10">
-          <span className="inline-flex rounded-full bg-accent/10 px-3 py-1 text-sm font-medium text-accent">
-            QueueSetu
-          </span>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
-            Reduce waiting time. Improve customer flow.
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-            QueueSetu helps businesses manage queues with real-time updates,
-            clear visibility, and a smoother check-in experience.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <button className="rounded-xl bg-primary px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
-              Start Free Trial
-            </button>
-            <button className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300">
-              View Demo
-            </button>
-          </div>
-        </section>
+        <HeroSection />
 
         <section className="mt-8 rounded-xl bg-white p-6 shadow-sm sm:p-8">
           <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
