@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,9 +13,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuthUIStore } from "@/store/use-auth-ui-store";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { isLoading, setLoading } = useAuthUIStore();
+
+  useEffect(() => {
+    setLoading(false);
+  }, [setLoading]);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (isLoading) {
+      return;
+    }
+
+    setLoading(true);
+    window.setTimeout(() => setLoading(false), 900);
+  };
 
   return (
     <motion.div
@@ -34,7 +51,11 @@ export default function LoginForm() {
         </CardHeader>
 
         <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
-          <form className="space-y-4" aria-label="Login form">
+          <form
+            className="space-y-4"
+            aria-label="Login form"
+            onSubmit={handleSubmit}
+          >
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -107,10 +128,21 @@ export default function LoginForm() {
 
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-accent/60 disabled:text-accent-foreground/80"
               aria-label="Login to QueueSetu"
             >
-              Login
+              {isLoading ? (
+                <>
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden="true"
+                  />
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
           </form>
 
