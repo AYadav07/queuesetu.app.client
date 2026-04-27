@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useCallback, useState, type FormEvent } from "react";
@@ -13,25 +14,56 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuthUIStore } from "@/store/use-auth-ui-store";
+import { authApi } from "@/lib/api/auth";
+import { useAuthStore } from "@/store/use-auth-store";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const isLoading = useAuthUIStore((state) => state.isLoading);
-  const setLoading = useAuthUIStore((state) => state.setLoading);
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+    async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (isLoading) {
-        return;
-      }
+      if (isLoading) return;
 
+      const form = event.currentTarget;
+      const email = (form.elements.namedItem("email") as HTMLInputElement)
+        .value.trim();
+      const password = (
+        form.elements.namedItem("password") as HTMLInputElement
+      ).value;
+
+      setError(null);
       setLoading(true);
-      window.setTimeout(() => setLoading(false), 900);
+
+      try {
+        const loginRes = await authApi.login({ email, password });
+        const userRes = await authApi.me(loginRes.accessToken);
+        setAuth(
+          {
+            id: userRes.id,
+            name: userRes.name,
+            email: userRes.email,
+            phone: userRes.phone,
+            active: userRes.active,
+          },
+          loginRes.accessToken,
+          loginRes.refreshToken,
+        );
+        router.push("/dashboard");
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Login failed. Please try again.",
+        );
+      } finally {
+        setLoading(false);
+      }
     },
-    [isLoading, setLoading],
+    [isLoading, setAuth, router],
   );
 
   return (
@@ -51,6 +83,15 @@ export default function LoginForm() {
         </CardHeader>
 
         <CardContent className="px-5 pb-6 sm:px-6 sm:pb-7">
+          {error && (
+            <div
+              role="alert"
+              className="mb-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {error}
+            </div>
+          )}
+
           <form
             className="space-y-5"
             aria-label="Login form"

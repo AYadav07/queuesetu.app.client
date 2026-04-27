@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useCallback, useState, type FormEvent } from "react";
@@ -13,26 +14,68 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuthUIStore } from "@/store/use-auth-ui-store";
+import { authApi } from "@/lib/api/auth";
+import { useAuthStore } from "@/store/use-auth-store";
 
 export default function RegisterForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const isLoading = useAuthUIStore((state) => state.isLoading);
-  const setLoading = useAuthUIStore((state) => state.setLoading);
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+    async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (isLoading) {
+      if (isLoading) return;
+
+      const form = event.currentTarget;
+      const name = (form.elements.namedItem("fullName") as HTMLInputElement).value.trim();
+      const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
+      const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+      const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
+      const terms = (form.elements.namedItem("terms") as HTMLInputElement).checked;
+
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+      if (!terms) {
+        setError("You must accept the terms & conditions.");
         return;
       }
 
+      setError(null);
       setLoading(true);
-      window.setTimeout(() => setLoading(false), 900);
+
+      try {
+        await authApi.signUp({ name, email, password });
+        // Auto-login after registration
+        const loginRes = await authApi.login({ email, password });
+        const userRes = await authApi.me(loginRes.accessToken);
+        setAuth(
+          {
+            id: userRes.id,
+            name: userRes.name,
+            email: userRes.email,
+            phone: userRes.phone,
+            active: userRes.active,
+          },
+          loginRes.accessToken,
+          loginRes.refreshToken,
+        );
+        router.push("/dashboard");
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Registration failed. Please try again.",
+        );
+      } finally {
+        setLoading(false);
+      }
     },
-    [isLoading, setLoading],
+    [isLoading, router, setAuth],
   );
 
   return (
@@ -52,6 +95,15 @@ export default function RegisterForm() {
         </CardHeader>
 
         <CardContent className="px-5 pb-6 sm:px-6 sm:pb-7">
+          {error && (
+            <div
+              role="alert"
+              className="mb-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {error}
+            </div>
+          )}
+
           <form
             className="space-y-5"
             aria-label="Register form"
