@@ -18,6 +18,7 @@ import Footer from "@/components/layout/Footer";
 import { accountApi, type Tenant, type Branch } from "@/lib/api/account";
 import { queueApi } from "@/lib/api/queue";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 // ── Animation variants ─────────────────────────────────────────────────────
 
@@ -175,7 +176,12 @@ export default function CreateQueueClient() {
     accountApi
       .getMyTenants(accessToken)
       .then(setTenants)
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        const msg =
+          e instanceof Error ? e.message : "Failed to load organisations";
+        setError(msg);
+        toast.error(msg);
+      })
       .finally(() => setLoadingTenants(false));
   }, [hydrated, accessToken]);
 
@@ -192,7 +198,10 @@ export default function CreateQueueClient() {
       );
       setBranches(data);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to load branches");
+      const message =
+        e instanceof Error ? e.message : "Failed to load branches";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoadingBranches(false);
     }
@@ -220,7 +229,9 @@ export default function CreateQueueClient() {
       );
       router.push(`/tenants/${selectedTenant.id}`);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to create queue");
+      const message = e instanceof Error ? e.message : "Failed to create queue";
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

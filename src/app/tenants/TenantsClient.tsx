@@ -10,9 +10,16 @@ import Navbar from "@/components/layout/Navbar";
 import { Container } from "@/components/layout/container";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { accountApi, type Tenant } from "@/lib/api/account";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 const containerVariants = {
   hidden: {},
@@ -21,7 +28,11 @@ const containerVariants = {
 
 const cardVariants = {
   hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: "easeOut" as const } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.32, ease: "easeOut" as const },
+  },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -32,7 +43,9 @@ function StatusBadge({ status }: { status: string }) {
         ? "bg-red-100 text-red-600"
         : "bg-slate-100 text-slate-500";
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}
+    >
       {status}
     </span>
   );
@@ -40,7 +53,9 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function TenantsClient() {
   const router = useRouter();
-  const [hydrated, setHydrated] = useState(() => useAuthStore.persist.hasHydrated());
+  const [hydrated, setHydrated] = useState(() =>
+    useAuthStore.persist.hasHydrated(),
+  );
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
 
@@ -49,7 +64,9 @@ export default function TenantsClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
+    const unsub = useAuthStore.persist.onFinishHydration(() =>
+      setHydrated(true),
+    );
     return unsub;
   }, []);
 
@@ -62,7 +79,12 @@ export default function TenantsClient() {
     accountApi
       .getMyTenants(accessToken)
       .then(setTenants)
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        const msg =
+          e instanceof Error ? e.message : "Failed to load organisations";
+        setError(msg);
+        toast.error(msg);
+      })
       .finally(() => setLoading(false));
   }, [hydrated, accessToken]);
 
@@ -89,8 +111,13 @@ export default function TenantsClient() {
             <div className="mb-8 flex items-start justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
-                  <Building2 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                  <span className="text-xs font-medium text-slate-600">Organisations</span>
+                  <Building2
+                    className="h-3.5 w-3.5 text-primary"
+                    aria-hidden="true"
+                  />
+                  <span className="text-xs font-medium text-slate-600">
+                    Organisations
+                  </span>
                 </div>
                 <h1 className="mt-3 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
                   My Organisations
@@ -121,9 +148,14 @@ export default function TenantsClient() {
             ) : tenants.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-14 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <Building2 className="h-6 w-6 text-primary" aria-hidden="true" />
+                  <Building2
+                    className="h-6 w-6 text-primary"
+                    aria-hidden="true"
+                  />
                 </div>
-                <p className="mt-4 text-base font-semibold text-slate-800">No organisations yet</p>
+                <p className="mt-4 text-base font-semibold text-slate-800">
+                  No organisations yet
+                </p>
                 <p className="mt-1 text-sm text-slate-500">
                   Create your first organisation to start managing queues.
                 </p>
@@ -143,16 +175,24 @@ export default function TenantsClient() {
               >
                 {tenants.map((tenant) => (
                   <motion.div key={tenant.id} variants={cardVariants}>
-                    <Link href={`/tenants/${tenant.id}`} className="block group">
+                    <Link
+                      href={`/tenants/${tenant.id}`}
+                      className="block group"
+                    >
                       <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <Building2 className="h-5 w-5" aria-hidden="true" />
+                                <Building2
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
                               </div>
                               <div>
-                                <CardTitle className="text-base">{tenant.name}</CardTitle>
+                                <CardTitle className="text-base">
+                                  {tenant.name}
+                                </CardTitle>
                                 <CardDescription className="text-xs">
                                   {tenant.plan ?? "No plan"}
                                 </CardDescription>

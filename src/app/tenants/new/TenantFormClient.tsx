@@ -22,6 +22,7 @@ import {
   type TenantPlan,
 } from "@/lib/api/account";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 const PLANS: { value: TenantPlan; label: string; description: string }[] = [
   { value: "FREE", label: "Free", description: "Up to 1 branch, 2 queues" },
@@ -115,7 +116,9 @@ export default function TenantFormClient({
         router.push("/tenants");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
+      toast.error(message);
       setSubmitting(false);
     }
   };

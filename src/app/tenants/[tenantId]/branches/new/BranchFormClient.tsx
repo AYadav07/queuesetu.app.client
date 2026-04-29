@@ -9,9 +9,16 @@ import Navbar from "@/components/layout/Navbar";
 import { Container } from "@/components/layout/container";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { accountApi, type BranchRequest } from "@/lib/api/account";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 type Field = {
   id: keyof Omit<BranchRequest, "tenantId">;
@@ -22,24 +29,50 @@ type Field = {
 };
 
 const fields: Field[] = [
-  { id: "name", label: "Branch name", placeholder: "e.g. Main Campus", required: true },
-  { id: "address", label: "Address", placeholder: "e.g. 12 MG Road", required: true },
+  {
+    id: "name",
+    label: "Branch name",
+    placeholder: "e.g. Main Campus",
+    required: true,
+  },
+  {
+    id: "address",
+    label: "Address",
+    placeholder: "e.g. 12 MG Road",
+    required: true,
+  },
   { id: "city", label: "City", placeholder: "e.g. Bengaluru", required: true },
-  { id: "pinCode", label: "PIN code", placeholder: "e.g. 560001", required: true },
-  { id: "phoneCode", label: "Phone / contact", placeholder: "e.g. +91-9876543210", required: false },
+  {
+    id: "pinCode",
+    label: "PIN code",
+    placeholder: "e.g. 560001",
+    required: true,
+  },
+  {
+    id: "phoneCode",
+    label: "Phone / contact",
+    placeholder: "e.g. +91-9876543210",
+    required: false,
+  },
 ];
 
 type Props = {
   tenantId: string;
-  branchId?: string;          // present in edit mode
+  branchId?: string; // present in edit mode
   initialValues?: Partial<BranchRequest>;
 };
 
-export default function BranchFormClient({ tenantId, branchId, initialValues }: Props) {
+export default function BranchFormClient({
+  tenantId,
+  branchId,
+  initialValues,
+}: Props) {
   const router = useRouter();
   const isEdit = !!branchId;
 
-  const [hydrated, setHydrated] = useState(() => useAuthStore.persist.hasHydrated());
+  const [hydrated, setHydrated] = useState(() =>
+    useAuthStore.persist.hasHydrated(),
+  );
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
 
@@ -54,7 +87,9 @@ export default function BranchFormClient({ tenantId, branchId, initialValues }: 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
+    const unsub = useAuthStore.persist.onFinishHydration(() =>
+      setHydrated(true),
+    );
     return unsub;
   }, []);
 
@@ -94,7 +129,10 @@ export default function BranchFormClient({ tenantId, branchId, initialValues }: 
       }
       router.push(`/tenants/${tenantId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
+      toast.error(message);
       setSubmitting(false);
     }
   };
@@ -123,8 +161,13 @@ export default function BranchFormClient({ tenantId, branchId, initialValues }: 
             {/* Header */}
             <div className="mb-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
-                <GitBranch className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
-                <span className="text-xs font-medium text-slate-600">Branch</span>
+                <GitBranch
+                  className="h-3.5 w-3.5 text-accent"
+                  aria-hidden="true"
+                />
+                <span className="text-xs font-medium text-slate-600">
+                  Branch
+                </span>
               </div>
               <h1 className="mt-3 text-3xl font-bold tracking-tight text-primary">
                 {isEdit ? "Edit Branch" : "Add a Branch"}
@@ -139,7 +182,9 @@ export default function BranchFormClient({ tenantId, branchId, initialValues }: 
             <Card className="rounded-2xl border-slate-200/80 shadow-sm">
               <CardHeader>
                 <CardTitle>Branch details</CardTitle>
-                <CardDescription>Fill in the location and contact information.</CardDescription>
+                <CardDescription>
+                  Fill in the location and contact information.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -151,8 +196,12 @@ export default function BranchFormClient({ tenantId, branchId, initialValues }: 
                       >
                         {field.label}
                         {field.required && (
-                          <span className="ml-0.5 text-destructive" aria-hidden="true">
-                            {" "}*
+                          <span
+                            className="ml-0.5 text-destructive"
+                            aria-hidden="true"
+                          >
+                            {" "}
+                            *
                           </span>
                         )}
                       </label>
@@ -191,7 +240,10 @@ export default function BranchFormClient({ tenantId, branchId, initialValues }: 
                       className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
                     >
                       {submitting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                        <Loader2
+                          className="h-4 w-4 animate-spin"
+                          aria-hidden="true"
+                        />
                       ) : null}
                       {isEdit ? "Save Changes" : "Add Branch"}
                     </Button>

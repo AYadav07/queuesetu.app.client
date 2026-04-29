@@ -30,6 +30,7 @@ import {
 import { accountApi, type Tenant, type Branch } from "@/lib/api/account";
 import { queueApi, type Queue } from "@/lib/api/queue";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 const containerVariants = {
   hidden: {},
@@ -109,7 +110,9 @@ export default function TenantDetailClient({ tenantId }: Props) {
       }
       setBranchQueues(grouped);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load data");
+      const message = e instanceof Error ? e.message : "Failed to load data";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -126,8 +129,10 @@ export default function TenantDetailClient({ tenantId }: Props) {
     try {
       await accountApi.deleteBranch(branchId, accessToken);
       setBranches((prev) => prev.filter((b) => b.id !== branchId));
+      toast.success("Branch deleted successfully");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Delete failed");
+      const message = e instanceof Error ? e.message : "Delete failed";
+      toast.error(message);
     } finally {
       setDeletingBranch(null);
     }

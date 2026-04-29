@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { authApi } from "@/lib/api/auth";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -31,11 +32,11 @@ export default function LoginForm() {
       if (isLoading) return;
 
       const form = event.currentTarget;
-      const email = (form.elements.namedItem("email") as HTMLInputElement)
-        .value.trim();
-      const password = (
-        form.elements.namedItem("password") as HTMLInputElement
-      ).value;
+      const email = (
+        form.elements.namedItem("email") as HTMLInputElement
+      ).value.trim();
+      const password = (form.elements.namedItem("password") as HTMLInputElement)
+        .value;
 
       setError(null);
       setLoading(true);
@@ -56,9 +57,12 @@ export default function LoginForm() {
         );
         router.push("/dashboard");
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Login failed. Please try again.",
-        );
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Login failed. Please try again.";
+        setError(message);
+        toast.error(message);
       } finally {
         setLoading(false);
       }

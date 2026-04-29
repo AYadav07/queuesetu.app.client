@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { authApi } from "@/lib/api/auth";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -32,11 +33,19 @@ export default function RegisterForm() {
       if (isLoading) return;
 
       const form = event.currentTarget;
-      const name = (form.elements.namedItem("fullName") as HTMLInputElement).value.trim();
-      const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
-      const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-      const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
-      const terms = (form.elements.namedItem("terms") as HTMLInputElement).checked;
+      const name = (
+        form.elements.namedItem("fullName") as HTMLInputElement
+      ).value.trim();
+      const email = (
+        form.elements.namedItem("email") as HTMLInputElement
+      ).value.trim();
+      const password = (form.elements.namedItem("password") as HTMLInputElement)
+        .value;
+      const confirmPassword = (
+        form.elements.namedItem("confirmPassword") as HTMLInputElement
+      ).value;
+      const terms = (form.elements.namedItem("terms") as HTMLInputElement)
+        .checked;
 
       if (password !== confirmPassword) {
         setError("Passwords do not match.");
@@ -68,9 +77,12 @@ export default function RegisterForm() {
         );
         router.push("/dashboard");
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Registration failed. Please try again.",
-        );
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Registration failed. Please try again.";
+        setError(message);
+        toast.error(message);
       } finally {
         setLoading(false);
       }

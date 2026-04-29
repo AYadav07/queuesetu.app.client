@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -34,6 +35,7 @@ import {
   type CreateServiceDefinitionRequest,
 } from "@/lib/api/booking";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "@/store/use-toast-store";
 
 const containerVariants = {
   hidden: {},
@@ -108,7 +110,10 @@ function AddServiceModal({
       const created = await bookingApi.createService(body, accessToken);
       onCreated(created);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create service");
+      const message =
+        err instanceof Error ? err.message : "Failed to create service";
+      setError(message);
+      toast.error(message);
       setSubmitting(false);
     }
   };
@@ -298,7 +303,9 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
       setBranch(b);
       setServices(svcs);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load data");
+      const message = e instanceof Error ? e.message : "Failed to load data";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -320,8 +327,9 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
     try {
       await bookingApi.deleteService(serviceId, accessToken);
       setServices((prev) => prev.filter((s) => s.id !== serviceId));
+      toast.success("Service deleted");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Delete failed");
+      toast.error(e instanceof Error ? e.message : "Delete failed");
     } finally {
       setDeletingId(null);
     }
@@ -477,7 +485,10 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
                       <motion.div key={svc.id} variants={itemVariants}>
                         <Card className="h-full transition-all duration-200 hover:shadow-md">
                           <CardContent className="flex h-full flex-col justify-between pt-5 pb-4 px-5">
-                            <div>
+                            <Link
+                              href={`/tenants/${tenantId}/branches/${branchId}/services/${svc.id}`}
+                              className="flex-1 focus-visible:outline-none"
+                            >
                               <div className="mb-3 flex items-start justify-between gap-2">
                                 <div className="flex items-center gap-2.5">
                                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -506,10 +517,8 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
                                   {svc.description}
                                 </p>
                               )}
-                            </div>
 
-                            <div className="mt-4 flex items-center justify-between">
-                              <div className="flex gap-4 text-xs text-slate-500">
+                              <div className="mt-3 flex gap-4 text-xs text-slate-500">
                                 {svc.avgDurationMin != null && (
                                   <span className="flex items-center gap-1">
                                     <Clock
@@ -529,10 +538,16 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
                                   </span>
                                 )}
                               </div>
+                            </Link>
+
+                            <div className="mt-4 flex justify-end">
                               <button
                                 type="button"
                                 disabled={deletingId === svc.id}
-                                onClick={() => handleDeleteService(svc.id)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleDeleteService(svc.id);
+                                }}
                                 className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 disabled:opacity-40"
                                 aria-label={`Delete service ${svc.name}`}
                               >

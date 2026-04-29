@@ -32,6 +32,36 @@ export type UpdateServiceDefinitionRequest = {
   active?: boolean;
 };
 
+// ── Slot types ─────────────────────────────────────────────────────────────
+
+export type ServiceSlot = {
+  id: string;
+  serviceId: string;
+  branchId: string;
+  slotDate: string;       // ISO date "YYYY-MM-DD"
+  startTime: string;      // "HH:mm:ss"
+  endTime: string;        // "HH:mm:ss"
+  maxCapacity: number | null;
+  currentBookings: number;
+  status: string;         // "OPEN" | "BLOCKED" | "FULL"
+};
+
+export type CreateServiceSlotRequest = {
+  serviceId: string;
+  branchId: string;
+  slotDate: string;       // "YYYY-MM-DD"
+  startTime: string;      // "HH:mm"
+  endTime: string;        // "HH:mm"
+  maxCapacity?: number;
+};
+
+export type UpdateServiceSlotRequest = {
+  startTime?: string;
+  endTime?: string;
+  maxCapacity?: number;
+  status?: string;
+};
+
 // ── Internal fetch helper ──────────────────────────────────────────────────
 
 async function request<T>(
@@ -99,4 +129,30 @@ export const bookingApi = {
   /** DELETE /api/services/:id */
   deleteService: (serviceId: string, token: string) =>
     request<void>(`/api/services/${serviceId}`, token, { method: "DELETE" }),
+};
+
+// ── Slot API ───────────────────────────────────────────────────────────────
+
+export const slotApi = {
+  /** GET /api/slots?serviceId=... */
+  getSlotsByService: (serviceId: string, token: string) =>
+    request<ServiceSlot[]>(`/api/slots?serviceId=${serviceId}`, token),
+
+  /** POST /api/slots */
+  createSlot: (body: CreateServiceSlotRequest, token: string) =>
+    request<ServiceSlot>("/api/slots", token, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  /** PUT /api/slots/:id */
+  updateSlot: (slotId: string, body: UpdateServiceSlotRequest, token: string) =>
+    request<ServiceSlot>(`/api/slots/${slotId}`, token, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  /** DELETE /api/slots/:id */
+  deleteSlot: (slotId: string, token: string) =>
+    request<void>(`/api/slots/${slotId}`, token, { method: "DELETE" }),
 };
