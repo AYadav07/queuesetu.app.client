@@ -22,6 +22,34 @@ export type Queue = {
   slotId: string | null;
 };
 
+export type QueueToken = {
+  id: string;
+  tokenNumber: number;
+  type: string | null;
+  status: string | null;
+  priorityScore: number | null;
+  checkinTime: string;
+  userId: string;
+  queueId: string;
+  appointmentId: string | null;
+};
+
+export type QueueDetail = {
+  id: string;
+  name: string;
+  tenantId: string;
+  branchId: string;
+  serviceId: string | null;
+  counterId: string | null;
+  slotId: string | null;
+  totalTokens: number;
+  waitingCount: number;
+  calledCount: number;
+  completedCount: number;
+  currentToken: QueueToken | null;
+  nextTokens: QueueToken[];
+};
+
 // ── Internal fetch helper ──────────────────────────────────────────────────
 
 async function request<T>(
@@ -73,5 +101,9 @@ export const queueApi = {
 
   getQueuesBySlot(slotId: string, token: string): Promise<Queue[]> {
     return request(`/api/queues/slot/${slotId}`, token);
+  },
+
+  getQueueDetail(queueId: string, token: string): Promise<QueueDetail> {
+    return request(`/api/queues/${queueId}/detail`, token);
   },
 };

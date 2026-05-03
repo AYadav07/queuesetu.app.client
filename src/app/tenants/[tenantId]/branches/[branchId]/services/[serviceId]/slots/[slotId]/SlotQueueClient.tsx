@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -447,24 +448,27 @@ export default function SlotQueueClient({
                   >
                     {queues.map((queue) => (
                       <motion.div key={queue.id} variants={itemVariants}>
-                        <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm transition-all hover:shadow-md">
+                        <Card className="group overflow-hidden rounded-2xl border-slate-200/80 shadow-sm transition-all hover:shadow-md hover:border-primary/40">
                           <CardContent className="flex items-center justify-between gap-4 px-5 py-4">
-                            <div className="flex items-center gap-4 min-w-0">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                            <Link
+                              href={`/queue/${queue.id}`}
+                              className="flex flex-1 items-center gap-4 min-w-0 focus-visible:outline-none"
+                            >
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
                                 <ListOrdered
                                   className="h-5 w-5"
                                   aria-hidden="true"
                                 />
                               </div>
                               <div className="min-w-0">
-                                <p className="truncate font-semibold text-slate-900">
+                                <p className="truncate font-semibold text-slate-900 group-hover:text-primary transition-colors">
                                   {queue.name}
                                 </p>
                                 <p className="mt-0.5 truncate text-xs text-slate-400">
-                                  ID: {queue.id}
+                                  View live queue →
                                 </p>
                               </div>
-                            </div>
+                            </Link>
 
                             <button
                               type="button"
