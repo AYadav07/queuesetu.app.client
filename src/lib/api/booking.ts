@@ -38,20 +38,20 @@ export type ServiceSlot = {
   id: string;
   serviceId: string;
   branchId: string;
-  slotDate: string;       // ISO date "YYYY-MM-DD"
-  startTime: string;      // "HH:mm:ss"
-  endTime: string;        // "HH:mm:ss"
+  slotDate: string; // ISO date "YYYY-MM-DD"
+  startTime: string; // "HH:mm:ss"
+  endTime: string; // "HH:mm:ss"
   maxCapacity: number | null;
   currentBookings: number;
-  status: string;         // "OPEN" | "BLOCKED" | "FULL"
+  status: string; // "OPEN" | "BLOCKED" | "FULL"
 };
 
 export type CreateServiceSlotRequest = {
   serviceId: string;
   branchId: string;
-  slotDate: string;       // "YYYY-MM-DD"
-  startTime: string;      // "HH:mm"
-  endTime: string;        // "HH:mm"
+  slotDate: string; // "YYYY-MM-DD"
+  startTime: string; // "HH:mm"
+  endTime: string; // "HH:mm"
   maxCapacity?: number;
 };
 

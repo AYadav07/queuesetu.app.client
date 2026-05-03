@@ -94,21 +94,21 @@ export default function TenantDetailClient({ tenantId }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const [t, b, allQueues] = await Promise.all([
+      const [t, b] = await Promise.all([
         accountApi.getTenant(tenantId, accessToken),
         accountApi.getBranchesByTenant(tenantId, accessToken),
-        queueApi
-          .getQueuesByTenant(tenantId, accessToken)
-          .catch(() => [] as Queue[]),
+//         queueApi
+//           .getQueuesByTenant(tenantId, accessToken)
+//           .catch(() => [] as Queue[]),
       ]);
       setTenant(t);
       setBranches(b);
       // Group queues by branchId
-      const grouped: Record<string, Queue[]> = {};
-      for (const q of allQueues) {
-        (grouped[q.branchId] ??= []).push(q);
-      }
-      setBranchQueues(grouped);
+//       const grouped: Record<string, Queue[]> = {};
+//       for (const q of allQueues) {
+//         (grouped[q.branchId] ??= []).push(q);
+//       }
+//       setBranchQueues(grouped);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load data";
       setError(message);
