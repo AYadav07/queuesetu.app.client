@@ -70,4 +70,8 @@ export const queueApi = {
   getQueuesByTenant(tenantId: string, token: string): Promise<Queue[]> {
     return request(`/api/queues/tenant/${tenantId}`, token);
   },
+
+  getQueuesBySlot(slotId: string, token: string): Promise<Queue[]> {
+    return request(`/api/queues/slot/${slotId}`, token);
+  },
 };

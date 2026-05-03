@@ -138,6 +138,10 @@ export const slotApi = {
   getSlotsByService: (serviceId: string, token: string) =>
     request<ServiceSlot[]>(`/api/slots?serviceId=${serviceId}`, token),
 
+  /** GET /api/slots/:id */
+  getSlot: (slotId: string, token: string) =>
+    request<ServiceSlot>(`/api/slots/${slotId}`, token),
+
   /** POST /api/slots */
   createSlot: (body: CreateServiceSlotRequest, token: string) =>
     request<ServiceSlot>("/api/slots", token, {

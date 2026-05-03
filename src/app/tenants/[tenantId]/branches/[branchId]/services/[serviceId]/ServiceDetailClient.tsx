@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -553,18 +554,21 @@ export default function ServiceDetailClient({
                           {dateSlots.map((slot) => (
                             <Card
                               key={slot.id}
-                              className="transition-all duration-200 hover:shadow-md"
+                              className="group transition-all duration-200 hover:shadow-md hover:border-primary/40"
                             >
                               <CardContent className="flex items-center justify-between gap-3 px-4 py-3.5">
-                                <div className="flex items-center gap-3 min-w-0">
-                                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Link
+                                  href={`/tenants/${tenantId}/branches/${branchId}/services/${serviceId}/slots/${slot.id}`}
+                                  className="flex flex-1 items-center gap-3 min-w-0 focus-visible:outline-none"
+                                >
+                                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
                                     <Clock
                                       className="h-4 w-4"
                                       aria-hidden="true"
                                     />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="font-semibold text-slate-900 text-sm">
+                                    <p className="font-semibold text-slate-900 text-sm group-hover:text-primary transition-colors">
                                       {formatTime(slot.startTime)} –{" "}
                                       {formatTime(slot.endTime)}
                                     </p>
@@ -582,7 +586,7 @@ export default function ServiceDetailClient({
                                       <SlotStatusBadge status={slot.status} />
                                     </div>
                                   </div>
-                                </div>
+                                </Link>
 
                                 <button
                                   type="button"
