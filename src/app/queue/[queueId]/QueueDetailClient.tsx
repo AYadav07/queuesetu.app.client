@@ -12,8 +12,11 @@ import {
   Layers,
   Loader2,
   ListOrdered,
+  LogIn,
+  PhoneCall,
   RefreshCw,
   Timer,
+  Ticket,
   Users,
 } from "lucide-react";
 
@@ -22,7 +25,13 @@ import { Container } from "@/components/layout/container";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { queueApi, type QueueDetail, type QueueToken } from "@/lib/api/queue";
+import {
+  queueApi,
+  canOperateQueue,
+  type QueueDetail,
+  type QueueToken,
+  type QueueTokenPosition,
+} from "@/lib/api/queue";
 import { accountApi, type Tenant, type Branch } from "@/lib/api/account";
 import {
   bookingApi,
@@ -157,6 +166,10 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [myPosition, setMyPosition] = useState<QueueTokenPosition | null>(null);
+  const [joining, setJoining] = useState(false);
+  const [callingNext, setCallingNext] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     const unsub = useAuthStore.persist.onFinishHydration(() =>
@@ -206,6 +219,16 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
             setService(serviceResult.value);
           if (slotResult.status === "fulfilled") setSlot(slotResult.value);
         }
+
+        // Always refresh the user's position (on initial load and on poll)
+        if (user?.id) {
+          const pos = await queueApi.getQueuePosition(
+            queueId,
+            user.id,
+            accessToken,
+          );
+          setMyPosition(pos);
+        }
       } catch (e) {
         const message = e instanceof Error ? e.message : "Failed to load queue";
         setError(message);
@@ -215,7 +238,7 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
         setRefreshing(false);
       }
     },
-    [queueId, accessToken],
+    [queueId, accessToken, user?.id],
   );
 
   // Initial load
@@ -238,6 +261,62 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
     );
   }
 
+  const handleJoinQueue = async () => {
+    if (!user || !accessToken) return;
+    setJoining(true);
+    try {
+      await queueApi.joinQueue(queueId, { userId: user.id }, accessToken);
+      // Re-fetch position immediately after joining
+      const pos = await queueApi.getQueuePosition(
+        queueId,
+        user.id,
+        accessToken,
+      );
+      setMyPosition(pos);
+      // Also refresh queue stats silently
+      await loadDetail(true);
+      toast.success("You have joined the queue!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to join queue");
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  const handleCallNext = async () => {
+    if (!accessToken) return;
+    setCallingNext(true);
+    try {
+      const next = await queueApi.callNext(queueId, accessToken);
+      if (next === null) {
+        toast.success("Queue is empty — no more tokens waiting");
+      } else {
+        toast.success(`Calling token #${next.tokenNumber}`);
+      }
+      await loadDetail(true);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to call next token");
+    } finally {
+      setCallingNext(false);
+    }
+  };
+
+  const handleMarkCompleted = async (tokenId: string) => {
+    if (!accessToken) return;
+    setCompleting(true);
+    try {
+      await queueApi.markCompleted(queueId, tokenId, accessToken);
+      toast.success("Token marked as completed");
+      await loadDetail(true);
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "Failed to mark token as completed",
+      );
+    } finally {
+      setCompleting(false);
+    }
+  };
+
   // Build back-link: if we know the tenant/branch/service chain go there, otherwise /dashboard
   const backHref = detail?.slotId
     ? `/slot/${detail.slotId}`
@@ -248,6 +327,10 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
         : detail?.tenantId
           ? `/tenant/${detail.tenantId}`
           : "/dashboard";
+
+  // Whether the logged-in user can operate the queue (call next / mark completed)
+  const isOperator =
+    !!detail && !!accessToken && canOperateQueue(detail, accessToken);
 
   return (
     <>
@@ -347,6 +430,91 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                   </CardContent>
                 </Card>
 
+                {/* ── Your queue status (join / live position) ────────── */}
+                {myPosition ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-8"
+                  >
+                    <Card className="overflow-hidden rounded-2xl border-primary/30 shadow-sm ring-1 ring-primary/20">
+                      <div className="h-1 w-full bg-accent" />
+                      <CardContent className="flex items-center justify-between gap-4 px-5 py-5">
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                            <Ticket className="h-6 w-6" aria-hidden="true" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-700">
+                              You are in the queue
+                            </p>
+                            {myPosition.position === null ||
+                            myPosition.position < 0 ? (
+                              <p className="mt-0.5 text-xs text-slate-500">
+                                Your token has been called or completed
+                              </p>
+                            ) : myPosition.position === 0 ? (
+                              <p className="mt-0.5 text-sm font-bold text-accent">
+                                🎉 You&apos;re next!
+                              </p>
+                            ) : (
+                              <p className="mt-0.5 text-xs text-slate-500">
+                                <span className="text-2xl font-bold text-primary">
+                                  {myPosition.position}
+                                </span>{" "}
+                                people ahead of you
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="shrink-0 rounded-full bg-accent/10 px-4 py-2 text-center">
+                          <p className="text-xs font-medium text-slate-500">
+                            Position
+                          </p>
+                          <p className="text-2xl font-bold text-accent leading-none">
+                            {myPosition.position === null ||
+                            myPosition.position < 0
+                              ? "—"
+                              : myPosition.position + 1}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ) : (
+                  <div className="mb-8 flex items-center justify-between gap-4 rounded-2xl border border-dashed border-slate-300 bg-white/60 px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+                        <LogIn className="h-5 w-5" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">
+                          Not in this queue yet
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Join to get a token and track your live position
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleJoinQueue}
+                      disabled={joining}
+                      className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                    >
+                      {joining ? (
+                        <Loader2
+                          className="h-4 w-4 animate-spin"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <LogIn className="h-4 w-4" aria-hidden="true" />
+                      )}
+                      {joining ? "Joining…" : "Join Queue"}
+                    </Button>
+                  </div>
+                )}
+
                 {/* ── Stats grid ─────────────────────────────────────────── */}
                 <motion.div
                   initial="hidden"
@@ -379,6 +547,70 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                     accent="emerald-500"
                   />
                 </motion.div>
+
+                {/* ── Operator controls (Call Next / Mark Completed) ─── */}
+                {isOperator && (
+                  <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-slate-800">
+                        Staff Controls
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {detail.currentToken?.status === "CALLED"
+                          ? "Mark the current token as completed before calling next"
+                          : detail.waitingCount === 0
+                            ? "No tokens waiting"
+                            : `${detail.waitingCount} token${detail.waitingCount !== 1 ? "s" : ""} waiting`}
+                      </p>
+                    </div>
+                    {/* Mark Completed — enabled only when a token is currently CALLED */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        detail.currentToken &&
+                        handleMarkCompleted(detail.currentToken.id)
+                      }
+                      disabled={
+                        completing ||
+                        callingNext ||
+                        detail.currentToken?.status !== "CALLED"
+                      }
+                      className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 disabled:opacity-60"
+                    >
+                      {completing ? (
+                        <Loader2
+                          className="h-4 w-4 animate-spin"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                      )}
+                      {completing ? "Completing…" : "Mark Completed"}
+                    </Button>
+                    {/* Call Next — enabled only when no token is currently being served */}
+                    <Button
+                      onClick={handleCallNext}
+                      disabled={
+                        callingNext ||
+                        completing ||
+                        detail.waitingCount === 0 ||
+                        detail.currentToken?.status === "CALLED"
+                      }
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                    >
+                      {callingNext ? (
+                        <Loader2
+                          className="h-4 w-4 animate-spin"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <PhoneCall className="h-4 w-4" aria-hidden="true" />
+                      )}
+                      {callingNext ? "Calling…" : "Call Next"}
+                    </Button>
+                  </div>
+                )}
 
                 {/* ── Currently serving ──────────────────────────────────── */}
                 <div className="mb-6">
