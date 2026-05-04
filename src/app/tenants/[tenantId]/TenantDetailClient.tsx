@@ -199,7 +199,7 @@ export default function TenantDetailClient({ tenantId }: Props) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => router.push(`/tenants/${tenantId}/edit`)}
+                      onClick={() => router.push(`/tenant/${tenantId}/edit`)}
                       aria-label="Edit tenant"
                     >
                       <Pencil className="h-4 w-4" aria-hidden="true" />
@@ -229,7 +229,7 @@ export default function TenantDetailClient({ tenantId }: Props) {
                   </div>
                   <Button
                     onClick={() =>
-                      router.push(`/tenants/${tenantId}/branches/new`)
+                      router.push(`/tenant/${tenantId}/add-new-branch`)
                     }
                     className="bg-accent text-accent-foreground hover:bg-accent/90"
                     aria-label="Add a new branch"
@@ -255,7 +255,7 @@ export default function TenantDetailClient({ tenantId }: Props) {
                     </p>
                     <Button
                       onClick={() =>
-                        router.push(`/tenants/${tenantId}/branches/new`)
+                        router.push(`/tenant/${tenantId}/add-new-branch`)
                       }
                       className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90"
                     >
@@ -360,9 +360,7 @@ export default function TenantDetailClient({ tenantId }: Props) {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() =>
-                                  router.push(
-                                    `/tenants/${tenantId}/branches/${branch.id}/edit`,
-                                  )
+                                  router.push(`/branch/${branch.id}/edit`)
                                 }
                                 aria-label={`Edit branch ${branch.name}`}
                               >

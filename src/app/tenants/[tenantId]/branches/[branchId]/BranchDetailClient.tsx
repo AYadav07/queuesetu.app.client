@@ -10,6 +10,7 @@ import {
   GitBranch,
   Loader2,
   MapPin,
+  Pencil,
   Phone,
   Plus,
   Stethoscope,
@@ -280,6 +281,10 @@ export default function BranchDetailClient({ branchId }: Props) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const handleAddService = () => {
+    router.push(`/branch/${branchId}/add-new-service`);
+  };
+
   useEffect(() => {
     const unsub = useAuthStore.persist.onFinishHydration(() =>
       setHydrated(true),
@@ -405,6 +410,14 @@ export default function BranchDetailClient({ branchId }: Props) {
                           </CardDescription>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/branch/${branchId}/edit`)}
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                        aria-label="Edit branch"
+                      >
+                        <Pencil className="h-4 w-4" aria-hidden="true" />
+                      </button>
                     </div>
                   </CardHeader>
                   <CardContent className="pb-6">
@@ -443,7 +456,7 @@ export default function BranchDetailClient({ branchId }: Props) {
                     </p>
                   </div>
                   <Button
-                    onClick={() => setShowAddModal(true)}
+                    onClick={handleAddService}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                     aria-label="Add a new service"
                   >
@@ -469,7 +482,7 @@ export default function BranchDetailClient({ branchId }: Props) {
                       appointments.
                     </p>
                     <Button
-                      onClick={() => setShowAddModal(true)}
+                      onClick={handleAddService}
                       className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       Add Service
@@ -541,7 +554,21 @@ export default function BranchDetailClient({ branchId }: Props) {
                               </div>
                             </Link>
 
-                            <div className="mt-4 flex justify-end">
+                            <div className="mt-4 flex items-center justify-end gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  router.push(`/service/${svc.id}/edit`);
+                                }}
+                                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                                aria-label={`Edit service ${svc.name}`}
+                              >
+                                <Pencil
+                                  className="h-4 w-4"
+                                  aria-hidden="true"
+                                />
+                              </button>
                               <button
                                 type="button"
                                 disabled={deletingId === svc.id}

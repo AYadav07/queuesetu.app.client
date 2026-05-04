@@ -56,19 +56,17 @@ const fields: Field[] = [
   },
 ];
 
-type Props = {
-  tenantId: string;
-  branchId?: string; // present in edit mode
-  initialValues?: Partial<BranchRequest>;
-};
+type Props =
+  | { mode: "create"; tenantId: string; branchId?: never }
+  | { mode: "edit"; branchId: string; tenantId?: never };
 
 export default function BranchFormClient({
-  tenantId,
+  mode,
+  tenantId: tenantIdProp,
   branchId,
-  initialValues,
 }: Props) {
   const router = useRouter();
-  const isEdit = !!branchId;
+  const isEdit = mode === "edit";
 
   const [hydrated, setHydrated] = useState(() =>
     useAuthStore.persist.hasHydrated(),
@@ -76,12 +74,16 @@ export default function BranchFormClient({
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
 
+  // tenantId is known immediately in create mode; in edit mode we fetch it
+  const [tenantId, setTenantId] = useState(tenantIdProp ?? "");
+  const [loadingEdit, setLoadingEdit] = useState(isEdit);
+
   const [formData, setFormData] = useState<Omit<BranchRequest, "tenantId">>({
-    name: initialValues?.name ?? "",
-    address: initialValues?.address ?? "",
-    city: initialValues?.city ?? "",
-    pinCode: initialValues?.pinCode ?? "",
-    phoneCode: initialValues?.phoneCode ?? "",
+    name: "",
+    address: "",
+    city: "",
+    pinCode: "",
+    phoneCode: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,11 +95,30 @@ export default function BranchFormClient({
     return unsub;
   }, []);
 
+  // In edit mode, load branch data to pre-populate the form and get tenantId
+  useEffect(() => {
+    if (!isEdit || !branchId || !accessToken || !hydrated) return;
+    accountApi
+      .getBranch(branchId, accessToken)
+      .then((b) => {
+        setTenantId(b.tenantId);
+        setFormData({
+          name: b.name,
+          address: b.address,
+          city: b.city,
+          pinCode: b.pinCode,
+          phoneCode: b.phoneCode ?? "",
+        });
+      })
+      .catch(() => {})
+      .finally(() => setLoadingEdit(false));
+  }, [isEdit, branchId, accessToken, hydrated]);
+
   useEffect(() => {
     if (hydrated && (!user || !accessToken)) router.replace("/login");
   }, [hydrated, user, accessToken, router]);
 
-  if (!hydrated || !user || !accessToken) {
+  if (!hydrated || !user || !accessToken || loadingEdit) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
@@ -127,7 +148,7 @@ export default function BranchFormClient({
       } else {
         await accountApi.createBranch(body, accessToken);
       }
-      router.push(`/tenants/${tenantId}`);
+      router.push(`/tenant/${tenantId}`);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Something went wrong";
@@ -151,7 +172,7 @@ export default function BranchFormClient({
             {/* Back */}
             <button
               type="button"
-              onClick={() => router.push(`/tenants/${tenantId}`)}
+              onClick={() => router.push(`/tenant/${tenantId}`)}
               className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -229,7 +250,7 @@ export default function BranchFormClient({
                       type="button"
                       variant="outline"
                       className="flex-1"
-                      onClick={() => router.push(`/tenants/${tenantId}`)}
+                      onClick={() => router.push(`/tenant/${tenantId}`)}
                       disabled={submitting}
                     >
                       Cancel

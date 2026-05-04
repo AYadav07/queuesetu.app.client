@@ -110,13 +110,14 @@ export default function TenantFormClient({
     try {
       if (isEdit) {
         await accountApi.updateTenant(tenantId!, body, accessToken);
-        router.push(`/tenants/${tenantId}`);
+        router.push(`/tenant/${tenantId}`);
       } else {
         await accountApi.createTenant(body, accessToken);
         router.push("/tenants");
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
       setError(message);
       toast.error(message);
       setSubmitting(false);

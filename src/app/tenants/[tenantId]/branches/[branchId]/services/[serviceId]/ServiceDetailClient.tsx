@@ -10,6 +10,7 @@ import {
   CalendarPlus,
   Clock,
   Loader2,
+  Pencil,
   Stethoscope,
   Trash2,
   Users,
@@ -313,6 +314,10 @@ export default function ServiceDetailClient({ serviceId }: Props) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const handleAddSlot = () => {
+    router.push(`/service/${serviceId}/add-new-slot`);
+  };
+
   useEffect(() => {
     const unsub = useAuthStore.persist.onFinishHydration(() =>
       setHydrated(true),
@@ -448,6 +453,16 @@ export default function ServiceDetailClient({ serviceId }: Props) {
                       >
                         {service.active ? "Active" : "Inactive"}
                       </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          router.push(`/service/${serviceId}/edit`)
+                        }
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                        aria-label="Edit service"
+                      >
+                        <Pencil className="h-4 w-4" aria-hidden="true" />
+                      </button>
                     </div>
                   </CardHeader>
                   <CardContent className="pb-5">
@@ -486,7 +501,7 @@ export default function ServiceDetailClient({ serviceId }: Props) {
                     </p>
                   </div>
                   <Button
-                    onClick={() => setShowAddModal(true)}
+                    onClick={handleAddSlot}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                     aria-label="Add a new slot"
                   >
@@ -512,7 +527,7 @@ export default function ServiceDetailClient({ serviceId }: Props) {
                       service.
                     </p>
                     <Button
-                      onClick={() => setShowAddModal(true)}
+                      onClick={handleAddSlot}
                       className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       Add Slot
@@ -580,22 +595,37 @@ export default function ServiceDetailClient({ serviceId }: Props) {
                                   </div>
                                 </Link>
 
-                                <button
-                                  type="button"
-                                  disabled={deletingId === slot.id}
-                                  onClick={() => handleDeleteSlot(slot.id)}
-                                  className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 disabled:opacity-40"
-                                  aria-label="Delete slot"
-                                >
-                                  {deletingId === slot.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <Trash2
+                                <div className="flex shrink-0 items-center gap-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      router.push(`/slot/${slot.id}/edit`)
+                                    }
+                                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                                    aria-label="Edit slot"
+                                  >
+                                    <Pencil
                                       className="h-4 w-4"
                                       aria-hidden="true"
                                     />
-                                  )}
-                                </button>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={deletingId === slot.id}
+                                    onClick={() => handleDeleteSlot(slot.id)}
+                                    className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 disabled:opacity-40"
+                                    aria-label="Delete slot"
+                                  >
+                                    {deletingId === slot.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Trash2
+                                        className="h-4 w-4"
+                                        aria-hidden="true"
+                                      />
+                                    )}
+                                  </button>
+                                </div>
                               </CardContent>
                             </Card>
                           ))}
