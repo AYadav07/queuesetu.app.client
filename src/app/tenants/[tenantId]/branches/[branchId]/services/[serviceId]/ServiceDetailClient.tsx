@@ -295,16 +295,10 @@ function groupByDate(slots: ServiceSlot[]): Map<string, ServiceSlot[]> {
 // ── Main Component ─────────────────────────────────────────────────────────
 
 type Props = {
-  tenantId: string;
-  branchId: string;
   serviceId: string;
 };
 
-export default function ServiceDetailClient({
-  tenantId,
-  branchId,
-  serviceId,
-}: Props) {
+export default function ServiceDetailClient({ serviceId }: Props) {
   const router = useRouter();
   const [hydrated, setHydrated] = useState(() =>
     useAuthStore.persist.hasHydrated(),
@@ -390,7 +384,7 @@ export default function ServiceDetailClient({
         {showAddModal && service && accessToken && (
           <AddSlotModal
             serviceId={serviceId}
-            branchId={branchId}
+            branchId={service.branchId}
             accessToken={accessToken}
             onClose={() => setShowAddModal(false)}
             onCreated={handleSlotCreated}
@@ -410,9 +404,7 @@ export default function ServiceDetailClient({
             {/* Back */}
             <button
               type="button"
-              onClick={() =>
-                router.push(`/tenants/${tenantId}/branches/${branchId}`)
-              }
+              onClick={() => router.push(`/branch/${service?.branchId}`)}
               className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -558,7 +550,7 @@ export default function ServiceDetailClient({
                             >
                               <CardContent className="flex items-center justify-between gap-3 px-4 py-3.5">
                                 <Link
-                                  href={`/tenants/${tenantId}/branches/${branchId}/services/${serviceId}/slots/${slot.id}`}
+                                  href={`/slot/${slot.id}`}
                                   className="flex flex-1 items-center gap-3 min-w-0 focus-visible:outline-none"
                                 >
                                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">

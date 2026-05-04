@@ -97,18 +97,18 @@ export default function TenantDetailClient({ tenantId }: Props) {
       const [t, b] = await Promise.all([
         accountApi.getTenant(tenantId, accessToken),
         accountApi.getBranchesByTenant(tenantId, accessToken),
-//         queueApi
-//           .getQueuesByTenant(tenantId, accessToken)
-//           .catch(() => [] as Queue[]),
+        //         queueApi
+        //           .getQueuesByTenant(tenantId, accessToken)
+        //           .catch(() => [] as Queue[]),
       ]);
       setTenant(t);
       setBranches(b);
       // Group queues by branchId
-//       const grouped: Record<string, Queue[]> = {};
-//       for (const q of allQueues) {
-//         (grouped[q.branchId] ??= []).push(q);
-//       }
-//       setBranchQueues(grouped);
+      //       const grouped: Record<string, Queue[]> = {};
+      //       for (const q of allQueues) {
+      //         (grouped[q.branchId] ??= []).push(q);
+      //       }
+      //       setBranchQueues(grouped);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load data";
       setError(message);
@@ -274,7 +274,7 @@ export default function TenantDetailClient({ tenantId }: Props) {
                         <Card className="transition-all duration-200 hover:shadow-md">
                           <CardContent className="flex items-start justify-between gap-4 pt-5 pb-5">
                             <Link
-                              href={`/tenants/${tenantId}/branches/${branch.id}`}
+                              href={`/branch/${branch.id}`}
                               className="flex items-start gap-3 flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-lg"
                             >
                               <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">

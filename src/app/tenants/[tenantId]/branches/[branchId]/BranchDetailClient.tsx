@@ -263,9 +263,9 @@ function AddServiceModal({
 
 // ── Main Component ─────────────────────────────────────────────────────────
 
-type Props = { tenantId: string; branchId: string };
+type Props = { branchId: string };
 
-export default function BranchDetailClient({ tenantId, branchId }: Props) {
+export default function BranchDetailClient({ branchId }: Props) {
   const router = useRouter();
   const [hydrated, setHydrated] = useState(() =>
     useAuthStore.persist.hasHydrated(),
@@ -302,6 +302,7 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
       ]);
       setBranch(b);
       setServices(svcs);
+      // no need to store tenantId separately — use branch.tenantId
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load data";
       setError(message);
@@ -348,7 +349,7 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
       <AnimatePresence>
         {showAddModal && branch && accessToken && (
           <AddServiceModal
-            tenantId={tenantId}
+            tenantId={branch.tenantId}
             branchId={branchId}
             accessToken={accessToken}
             onClose={() => setShowAddModal(false)}
@@ -369,7 +370,7 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
             {/* Back */}
             <button
               type="button"
-              onClick={() => router.push(`/tenants/${tenantId}`)}
+              onClick={() => router.push(`/tenant/${branch?.tenantId}`)}
               className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -486,7 +487,7 @@ export default function BranchDetailClient({ tenantId, branchId }: Props) {
                         <Card className="h-full transition-all duration-200 hover:shadow-md">
                           <CardContent className="flex h-full flex-col justify-between pt-5 pb-4 px-5">
                             <Link
-                              href={`/tenants/${tenantId}/branches/${branchId}/services/${svc.id}`}
+                              href={`/service/${svc.id}`}
                               className="flex-1 focus-visible:outline-none"
                             >
                               <div className="mb-3 flex items-start justify-between gap-2">

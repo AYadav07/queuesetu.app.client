@@ -239,10 +239,15 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
   }
 
   // Build back-link: if we know the tenant/branch/service chain go there, otherwise /dashboard
-  const backHref =
-    detail?.tenantId && detail?.branchId && detail?.serviceId && detail?.slotId
-      ? `/tenants/${detail.tenantId}/branches/${detail.branchId}/services/${detail.serviceId}/slots/${detail.slotId}`
-      : "/dashboard";
+  const backHref = detail?.slotId
+    ? `/slot/${detail.slotId}`
+    : detail?.serviceId
+      ? `/service/${detail.serviceId}`
+      : detail?.branchId
+        ? `/branch/${detail.branchId}`
+        : detail?.tenantId
+          ? `/tenant/${detail.tenantId}`
+          : "/dashboard";
 
   return (
     <>

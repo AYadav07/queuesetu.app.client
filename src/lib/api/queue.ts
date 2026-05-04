@@ -106,4 +106,8 @@ export const queueApi = {
   getQueueDetail(queueId: string, token: string): Promise<QueueDetail> {
     return request(`/api/queues/${queueId}/detail`, token);
   },
+
+  getAllQueues(token: string): Promise<Queue[]> {
+    return request("/api/queues", token);
+  },
 };

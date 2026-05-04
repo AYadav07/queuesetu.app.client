@@ -7,21 +7,11 @@ export const metadata: Metadata = {
 
 type Props = {
   params: Promise<{
-    tenantId: string;
-    branchId: string;
-    serviceId: string;
     slotId: string;
   }>;
 };
 
 export default async function SlotQueuePage({ params }: Props) {
-  const { tenantId, branchId, serviceId, slotId } = await params;
-  return (
-    <SlotQueueClient
-      tenantId={tenantId}
-      branchId={branchId}
-      serviceId={serviceId}
-      slotId={slotId}
-    />
-  );
+  const { slotId } = await params;
+  return <SlotQueueClient slotId={slotId} />;
 }

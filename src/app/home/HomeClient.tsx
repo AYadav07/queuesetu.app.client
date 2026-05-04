@@ -22,8 +22,8 @@ function getGreeting(): string {
 
 export default function HomeClient() {
   const router = useRouter();
-  const [hydrated, setHydrated] = useState(
-    () => useAuthStore.persist.hasHydrated(),
+  const [hydrated, setHydrated] = useState(() =>
+    useAuthStore.persist.hasHydrated(),
   );
 
   const user = useAuthStore((state) => state.user);
@@ -81,7 +81,10 @@ export default function HomeClient() {
             {/* Page header */}
             <div className="mb-10">
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+                <span
+                  className="h-2 w-2 rounded-full bg-accent"
+                  aria-hidden="true"
+                />
                 <span className="text-xs font-medium text-slate-600">
                   QueueSetu
                 </span>
@@ -133,7 +136,10 @@ export default function HomeClient() {
               ) : tenants.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-8 text-center">
                   <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Building2 className="h-5 w-5 text-primary" aria-hidden="true" />
+                    <Building2
+                      className="h-5 w-5 text-primary"
+                      aria-hidden="true"
+                    />
                   </div>
                   <p className="mt-3 text-sm font-medium text-slate-700">
                     No organisations yet
@@ -154,7 +160,7 @@ export default function HomeClient() {
                   {tenants.slice(0, 3).map((tenant) => (
                     <Link
                       key={tenant.id}
-                      href={`/tenants/${tenant.id}`}
+                      href={`/tenant/${tenant.id}`}
                       className="block group"
                     >
                       <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">

@@ -28,6 +28,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { slotApi, type ServiceSlot } from "@/lib/api/booking";
+import { accountApi } from "@/lib/api/account";
 import { queueApi, type Queue, type QueueRequest } from "@/lib/api/queue";
 import { useAuthStore } from "@/store/use-auth-store";
 import { toast } from "@/store/use-toast-store";
@@ -213,18 +214,10 @@ function CreateQueueModal({
 // ── Main Component ─────────────────────────────────────────────────────────
 
 type Props = {
-  tenantId: string;
-  branchId: string;
-  serviceId: string;
   slotId: string;
 };
 
-export default function SlotQueueClient({
-  tenantId,
-  branchId,
-  serviceId,
-  slotId,
-}: Props) {
+export default function SlotQueueClient({ slotId }: Props) {
   const router = useRouter();
   const [hydrated, setHydrated] = useState(() =>
     useAuthStore.persist.hasHydrated(),
@@ -233,6 +226,7 @@ export default function SlotQueueClient({
   const accessToken = useAuthStore((s) => s.accessToken);
 
   const [slot, setSlot] = useState<ServiceSlot | null>(null);
+  const [tenantId, setTenantId] = useState("");
   const [queues, setQueues] = useState<Queue[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -261,6 +255,9 @@ export default function SlotQueueClient({
       ]);
       setSlot(slotData);
       setQueues(queueList);
+      // Fetch branch to get tenantId for queue creation
+      const branch = await accountApi.getBranch(slotData.branchId, accessToken);
+      setTenantId(branch.tenantId);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load data";
       setError(message);
@@ -309,8 +306,8 @@ export default function SlotQueueClient({
         {showCreateModal && slot && accessToken && (
           <CreateQueueModal
             tenantId={tenantId}
-            branchId={branchId}
-            serviceId={serviceId}
+            branchId={slot.branchId}
+            serviceId={slot.serviceId}
             slotId={slotId}
             accessToken={accessToken}
             onClose={() => setShowCreateModal(false)}
@@ -331,11 +328,7 @@ export default function SlotQueueClient({
             {/* Back */}
             <button
               type="button"
-              onClick={() =>
-                router.push(
-                  `/tenants/${tenantId}/branches/${branchId}/services/${serviceId}`,
-                )
-              }
+              onClick={() => router.push(`/service/${slot?.serviceId}`)}
               className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />

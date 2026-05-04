@@ -6,16 +6,10 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  params: Promise<{ tenantId: string; branchId: string; serviceId: string }>;
+  params: Promise<{ serviceId: string }>;
 };
 
 export default async function ServiceDetailPage({ params }: Props) {
-  const { tenantId, branchId, serviceId } = await params;
-  return (
-    <ServiceDetailClient
-      tenantId={tenantId}
-      branchId={branchId}
-      serviceId={serviceId}
-    />
-  );
+  const { serviceId } = await params;
+  return <ServiceDetailClient serviceId={serviceId} />;
 }

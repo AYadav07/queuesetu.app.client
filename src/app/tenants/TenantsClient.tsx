@@ -175,10 +175,7 @@ export default function TenantsClient() {
               >
                 {tenants.map((tenant) => (
                   <motion.div key={tenant.id} variants={cardVariants}>
-                    <Link
-                      href={`/tenants/${tenant.id}`}
-                      className="block group"
-                    >
+                    <Link href={`/tenant/${tenant.id}`} className="block group">
                       <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
