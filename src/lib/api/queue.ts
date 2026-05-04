@@ -65,42 +65,19 @@ export type QueueTokenPosition = {
   position: number | null;
 };
 
-// ── Role helpers ───────────────────────────────────────────────────────────
-// JWT `roles` claim is [[abbreviatedRole, id], ...] where:
-//   TA = TENANT_ADMIN (id = tenantId)
-//   BA = BRANCH_ADMIN (id = branchId)
-//   ST = STAFF
-//   CU = CUSTOMER
-
-type RolePair = [string, string];
-
-function parseRoles(accessToken: string): RolePair[] {
-  try {
-    const payload = JSON.parse(atob(accessToken.split(".")[1]));
-    return (payload.roles as RolePair[]) ?? [];
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Returns true if the user (identified by `accessToken`) can operate the
- * "Call Next" / "Mark Completed" controls for the given queue.
- * Eligible roles: TENANT_ADMIN for the queue's tenant, BRANCH_ADMIN for the
- * queue's branch, or any STAFF assignment.
- */
-export function canOperateQueue(
-  queue: { tenantId: string; branchId: string },
-  accessToken: string,
-): boolean {
-  const roles = parseRoles(accessToken);
-  return roles.some(
-    ([role, id]) =>
-      (role === "TA" && id === queue.tenantId) ||
-      (role === "BA" && id === queue.branchId) ||
-      role === "ST",
-  );
-}
+// ── Role helpers — delegated to @/lib/roles ────────────────────────────────
+// Re-export so existing imports from this file keep working.
+export {
+  parseRolesFromToken,
+  canOperateQueue,
+  isSuperAdmin,
+  isTenantAdmin,
+  isBranchAdmin,
+  isServiceManager,
+  isStaffForQueue,
+  type ParsedRoles,
+  type RolePair,
+} from "@/lib/roles";
 
 // ── Internal fetch helper ──────────────────────────────────────────────────
 

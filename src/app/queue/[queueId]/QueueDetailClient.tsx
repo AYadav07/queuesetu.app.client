@@ -27,11 +27,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   queueApi,
-  canOperateQueue,
   type QueueDetail,
   type QueueToken,
   type QueueTokenPosition,
 } from "@/lib/api/queue";
+import { parseRolesFromToken, canOperateQueue } from "@/lib/roles";
 import { accountApi, type Tenant, type Branch } from "@/lib/api/account";
 import {
   bookingApi,
@@ -330,7 +330,14 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
 
   // Whether the logged-in user can operate the queue (call next / mark completed)
   const isOperator =
-    !!detail && !!accessToken && canOperateQueue(detail, accessToken);
+    !!detail &&
+    !!accessToken &&
+    canOperateQueue(parseRolesFromToken(accessToken), {
+      queueId,
+      tenantId: detail.tenantId,
+      branchId: detail.branchId,
+      serviceId: detail.serviceId ?? undefined,
+    });
 
   return (
     <>
