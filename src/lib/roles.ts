@@ -141,3 +141,78 @@ export function canOperateQueue(
     isStaffForQueue(roles, opts.queueId)
   );
 }
+
+// ── Scoped write-operation guards ─────────────────────────────────────────
+// Use these to conditionally show / hide action buttons in the UI.
+// Each mirrors the corresponding backend RBAC rule.
+
+/**
+ * Rule #1 — edit or delete a tenant.
+ * SA || TA(tenantId)
+ */
+export function canEditTenant(roles: ParsedRoles, tenantId?: string): boolean {
+  return isTenantAdmin(roles, tenantId);
+}
+
+/**
+ * Rule #1 — add a new branch to a tenant.
+ * SA || TA(tenantId)
+ */
+export function canCreateBranch(
+  roles: ParsedRoles,
+  tenantId?: string,
+): boolean {
+  return isTenantAdmin(roles, tenantId);
+}
+
+/**
+ * Rule #2 — edit or delete a branch, or add a service to it.
+ * SA || TA(tenantId) || BA(branchId)
+ */
+export function canManageBranch(
+  roles: ParsedRoles,
+  opts: { branchId?: string; tenantId?: string },
+): boolean {
+  return (
+    isBranchAdmin(roles, opts.branchId) || isTenantAdmin(roles, opts.tenantId)
+  );
+}
+
+/**
+ * Rule #2 — create, edit or delete a service.
+ * SA || TA(tenantId) || BA(branchId)
+ */
+export function canManageService(
+  roles: ParsedRoles,
+  opts: { branchId?: string; tenantId?: string },
+): boolean {
+  return (
+    isBranchAdmin(roles, opts.branchId) || isTenantAdmin(roles, opts.tenantId)
+  );
+}
+
+/**
+ * Rule #3 — create, edit or delete a slot.
+ * SA || TA(tenantId) || BA(branchId) || SM(serviceId)
+ */
+export function canManageSlot(
+  roles: ParsedRoles,
+  opts: { serviceId?: string; branchId?: string; tenantId?: string },
+): boolean {
+  return (
+    isServiceManager(roles, opts.serviceId) ||
+    isBranchAdmin(roles, opts.branchId) ||
+    isTenantAdmin(roles, opts.tenantId)
+  );
+}
+
+/**
+ * Rule #3 — create or delete a queue (lifecycle management).
+ * SA || TA(tenantId) || BA(branchId) || SM(serviceId)
+ */
+export function canManageQueue(
+  roles: ParsedRoles,
+  opts: { serviceId?: string; branchId?: string; tenantId?: string },
+): boolean {
+  return canManageSlot(roles, opts);
+}

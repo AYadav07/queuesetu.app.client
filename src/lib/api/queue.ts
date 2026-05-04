@@ -75,6 +75,12 @@ export {
   isBranchAdmin,
   isServiceManager,
   isStaffForQueue,
+  canEditTenant,
+  canCreateBranch,
+  canManageBranch,
+  canManageService,
+  canManageSlot,
+  canManageQueue,
   type ParsedRoles,
   type RolePair,
 } from "@/lib/roles";
