@@ -31,7 +31,11 @@ import {
   type QueueToken,
   type QueueTokenPosition,
 } from "@/lib/api/queue";
-import { parseRolesFromToken, canOperateQueue } from "@/lib/roles";
+import {
+  parseRolesFromToken,
+  canOperateQueue,
+  canManageQueue,
+} from "@/lib/roles";
 import { accountApi, type Tenant, type Branch } from "@/lib/api/account";
 import {
   bookingApi,
@@ -385,21 +389,40 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                       </p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => loadDetail(true)}
-                    disabled={refreshing}
-                    className="shrink-0"
-                  >
-                    <RefreshCw
-                      className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
-                      aria-hidden="true"
-                    />
-                    Refresh
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {detail &&
+                      canManageQueue(parseRolesFromToken(accessToken), {
+                        tenantId: detail.tenantId,
+                        branchId: detail.branchId,
+                        serviceId: detail.serviceId ?? undefined,
+                      }) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            router.push(`/queue/${queueId}/manage-access`)
+                          }
+                          className="shrink-0"
+                        >
+                          <Users className="h-4 w-4" aria-hidden="true" />
+                          Manage Access
+                        </Button>
+                      )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => loadDetail(true)}
+                      disabled={refreshing}
+                      className="shrink-0"
+                    >
+                      <RefreshCw
+                        className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+                        aria-hidden="true"
+                      />
+                      Refresh
+                    </Button>
+                  </div>
                 </div>
-
                 {/* ── Context breadcrumb (tenant → branch → service → slot) */}
                 <Card className="mb-8 overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
                   <div className="h-1 w-full bg-primary" />
@@ -436,7 +459,6 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                     </dl>
                   </CardContent>
                 </Card>
-
                 {/* ── Your queue status (join / live position) ────────── */}
                 {myPosition ? (
                   <motion.div
@@ -521,7 +543,6 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                     </Button>
                   </div>
                 )}
-
                 {/* ── Stats grid ─────────────────────────────────────────── */}
                 <motion.div
                   initial="hidden"
@@ -554,7 +575,6 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                     accent="emerald-500"
                   />
                 </motion.div>
-
                 {/* ── Operator controls (Call Next / Mark Completed) ─── */}
                 {isOperator && (
                   <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-5 py-4">
@@ -618,8 +638,7 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                     </Button>
                   </div>
                 )}
-
-                {/* ── Currently serving ──────────────────────────────────── */}
+                {/* ── Currently serving ──────────────────────────────────── */}{" "}
                 <div className="mb-6">
                   <h2 className="mb-3 text-base font-semibold text-slate-800">
                     Currently Serving
@@ -632,7 +651,6 @@ export default function QueueDetailClient({ queueId }: { queueId: string }) {
                     </div>
                   )}
                 </div>
-
                 {/* ── Up next ────────────────────────────────────────────── */}
                 <div>
                   <h2 className="mb-3 text-base font-semibold text-slate-800">

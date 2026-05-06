@@ -31,6 +31,8 @@ import { accountApi, type Tenant, type Branch } from "@/lib/api/account";
 import { queueApi, type Queue } from "@/lib/api/queue";
 import { useAuthStore } from "@/store/use-auth-store";
 import { toast } from "@/store/use-toast-store";
+import { parseRolesFromToken, canEditTenant } from "@/lib/roles";
+import { Users } from "lucide-react";
 
 const containerVariants = {
   hidden: {},
@@ -196,15 +198,33 @@ export default function TenantDetailClient({ tenantId }: Props) {
                         </CardDescription>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => router.push(`/tenant/${tenantId}/edit`)}
-                      aria-label="Edit tenant"
-                    >
-                      <Pencil className="h-4 w-4" aria-hidden="true" />
-                      Edit
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {canEditTenant(
+                        parseRolesFromToken(accessToken),
+                        tenantId,
+                      ) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            router.push(`/tenant/${tenantId}/manage-access`)
+                          }
+                          aria-label="Manage access"
+                        >
+                          <Users className="h-4 w-4" aria-hidden="true" />
+                          Manage Access
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/tenant/${tenantId}/edit`)}
+                        aria-label="Edit tenant"
+                      >
+                        <Pencil className="h-4 w-4" aria-hidden="true" />
+                        Edit
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="pb-6">
                     <p className="text-xs text-slate-500">

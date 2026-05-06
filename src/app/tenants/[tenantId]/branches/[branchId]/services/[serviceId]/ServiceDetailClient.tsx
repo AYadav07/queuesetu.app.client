@@ -37,6 +37,7 @@ import {
 } from "@/lib/api/booking";
 import { useAuthStore } from "@/store/use-auth-store";
 import { toast } from "@/store/use-toast-store";
+import { parseRolesFromToken, canManageService } from "@/lib/roles";
 
 // ── Animation variants ─────────────────────────────────────────────────────
 
@@ -453,16 +454,37 @@ export default function ServiceDetailClient({ serviceId }: Props) {
                       >
                         {service.active ? "Active" : "Inactive"}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          router.push(`/service/${serviceId}/edit`)
-                        }
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
-                        aria-label="Edit service"
-                      >
-                        <Pencil className="h-4 w-4" aria-hidden="true" />
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        {service &&
+                          canManageService(parseRolesFromToken(accessToken), {
+                            branchId: service.branchId,
+                            tenantId: service.tenantId,
+                          }) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                router.push(
+                                  `/service/${serviceId}/manage-access`,
+                                )
+                              }
+                              aria-label="Manage access"
+                            >
+                              <Users className="h-4 w-4" aria-hidden="true" />
+                              Manage Access
+                            </Button>
+                          )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            router.push(`/service/${serviceId}/edit`)
+                          }
+                          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                          aria-label="Edit service"
+                        >
+                          <Pencil className="h-4 w-4" aria-hidden="true" />
+                        </button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pb-5">
